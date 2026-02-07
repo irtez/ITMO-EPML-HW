@@ -1,0 +1,39 @@
+stages:
+  prepare:
+    cmd: python scripts/prepare.py
+    deps:
+      - scripts/prepare.py
+      - src/housing/data/load.py
+      - data/raw/housing.csv
+    params:
+      - prepare.test_size
+      - prepare.random_state
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+  train:
+    cmd: python scripts/train.py
+    deps:
+      - scripts/train.py
+      - src/housing/features/build.py
+      - src/housing/models/train.py
+      - data/processed/train.csv
+    params:
+      - train
+    outs:
+      - models/best_model.joblib
+    metrics:
+      - metrics/train_metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python scripts/evaluate.py
+    deps:
+      - scripts/evaluate.py
+      - src/housing/features/build.py
+      - models/best_model.joblib
+      - data/processed/test.csv
+    metrics:
+      - metrics/test_metrics.json:
+          cache: false

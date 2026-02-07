@@ -45,6 +45,9 @@ cd ITMO-EPML-HW
 # Install all dependencies (creates .venv automatically)
 poetry install
 
+# Pull data from DVC remote storage
+poetry run dvc pull
+
 # Activate the virtual environment
 poetry shell
 ```
@@ -115,12 +118,39 @@ poetry run pre-commit run --all-files
 poetry run pytest
 ```
 
+## ML Pipeline (DVC)
+
+Data and pipeline are managed with [DVC](https://dvc.org/). Raw data is stored in a local DVC remote (`~/dvc-storage`).
+
+```bash
+# Download data
+poetry run dvc pull
+
+# Run the full pipeline (prepare → train → evaluate)
+poetry run dvc repro
+
+# Show metrics
+poetry run dvc metrics show
+```
+
+The pipeline is defined in `dvc.yaml` with hyperparameters in `params.yaml`. It trains three models (LinearRegression, Ridge, RandomForest) and registers the best one in the MLflow Model Registry.
+
+## Experiment Tracking (MLflow)
+
+Experiments are tracked locally via MLflow (no server required):
+
+```bash
+# Launch the MLflow UI
+poetry run mlflow ui --backend-store-uri file:./mlruns --port 5000
+# Open http://localhost:5000
+```
+
 ## Docker
 
 ```bash
 # Build the image
-docker build -t housing .
+docker build -t housing:hw2 .
 
-# Run a container
-docker run --rm housing
+# Run the full pipeline inside the container
+docker run --rm housing:hw2
 ```
