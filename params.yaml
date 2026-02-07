@@ -1,0 +1,13 @@
+prepare:
+  test_size: 0.2
+  random_state: 42
+
+train:
+  random_state: 42
+  models:
+    linear_regression: {}
+    ridge:
+      alpha: 1.0
+    random_forest:
+      n_estimators: 100
+      max_depth: 10

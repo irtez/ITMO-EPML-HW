@@ -1,0 +1,15 @@
+{
+  "best_model": "random_forest",
+  "best_train_rmse": 1.493633813943897,
+  "all_models": {
+    "linear_regression": {
+      "train_rmse": 4.6520331848801675
+    },
+    "ridge": {
+      "train_rmse": 4.652176971845966
+    },
+    "random_forest": {
+      "train_rmse": 1.493633813943897
+    }
+  }
+}

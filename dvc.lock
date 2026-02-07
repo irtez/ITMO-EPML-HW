@@ -1,0 +1,93 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python scripts/prepare.py
+    deps:
+    - path: data/raw/housing.csv
+      hash: md5
+      md5: d4accdce7a25600298819f8e28e8d593
+      size: 49082
+    - path: scripts/prepare.py
+      hash: md5
+      md5: c581566bf018381597c6eb52d6b9d184
+      size: 1032
+    - path: src/housing/data/load.py
+      hash: md5
+      md5: 06e27392257da94c16d91629172ea486
+      size: 1679
+    params:
+      params.yaml:
+        prepare.random_state: 42
+        prepare.test_size: 0.2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 63ba6aaa77d7d2cb721fd841f3d49775
+      size: 7547
+    - path: data/processed/train.csv
+      hash: md5
+      md5: bb1e5bcc9b88e671891c1b4d70509d52
+      size: 29661
+  train:
+    cmd: python scripts/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: bb1e5bcc9b88e671891c1b4d70509d52
+      size: 29661
+    - path: scripts/train.py
+      hash: md5
+      md5: 364c401bca675f72324a66efb888cd8c
+      size: 3117
+    - path: src/housing/features/build.py
+      hash: md5
+      md5: 7c7656776d91dd3afc280f999058246c
+      size: 1103
+    - path: src/housing/models/train.py
+      hash: md5
+      md5: c9cbc1b3c1df2b90603af9e1af902dcf
+      size: 3263
+    params:
+      params.yaml:
+        train:
+          random_state: 42
+          models:
+            linear_regression: {}
+            ridge:
+              alpha: 1.0
+            random_forest:
+              n_estimators: 100
+              max_depth: 10
+    outs:
+    - path: metrics/train_metrics.json
+      hash: md5
+      md5: f2cc19ead76122bc6eaf17727cb82188
+      size: 298
+    - path: models/best_model.joblib
+      hash: md5
+      md5: eef02fff960759bf566e232f3534cc74
+      size: 2295936
+  evaluate:
+    cmd: python scripts/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 63ba6aaa77d7d2cb721fd841f3d49775
+      size: 7547
+    - path: models/best_model.joblib
+      hash: md5
+      md5: eef02fff960759bf566e232f3534cc74
+      size: 2295936
+    - path: scripts/evaluate.py
+      hash: md5
+      md5: ec4ca32d0a58234dd71698526e8f3161
+      size: 978
+    - path: src/housing/features/build.py
+      hash: md5
+      md5: 7c7656776d91dd3afc280f999058246c
+      size: 1103
+    outs:
+    - path: metrics/test_metrics.json
+      hash: md5
+      md5: 8bb7a0a6fe187d46d9e12fd0dfce7802
+      size: 88
