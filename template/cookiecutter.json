@@ -1,0 +1,8 @@
+{
+  "project_name": "My DS Project",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "author_name": "Your Name",
+  "description": "A short description of the project.",
+  "python_version": "3.10",
+  "open_source_license": ["MIT", "BSD-3-Clause", "No license file"]
+}
