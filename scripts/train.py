@@ -26,7 +26,7 @@ def main() -> None:
     params: dict[str, Any] = raw_params["train"]
     random_state: int = int(params["random_state"])
 
-    mlflow.set_tracking_uri("file:./mlruns")
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("boston-housing")
 
     train_df = pd.read_csv("data/processed/train.csv")

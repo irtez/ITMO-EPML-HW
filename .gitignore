@@ -60,4 +60,5 @@ Thumbs.db
 .env.*
 
 # MLflow experiment tracking
+mlflow.db
 mlruns/
