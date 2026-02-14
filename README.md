@@ -20,7 +20,13 @@ ITMO-EPML-HW/
 │       ├── data/       # Data loading & cleaning scripts
 │       ├── features/   # Feature engineering
 │       ├── models/     # Model training & evaluation
+│       ├── tracking/   # MLflow tracking utilities (decorator, context manager, utils)
 │       └── visualization/
+├── scripts/
+│   ├── prepare.py      # DVC stage 1: raw → train/test split
+│   ├── train.py        # DVC stage 2: training + MLflow + registry
+│   ├── evaluate.py     # DVC stage 3: evaluation on test set
+│   └── run_experiments.py  # Standalone: run 21 HW3 experiments
 ├── template/           # Cookiecutter template for new DS projects
 ├── tests/              # pytest test suite
 ├── .pre-commit-config.yaml
@@ -137,20 +143,28 @@ The pipeline is defined in `dvc.yaml` with hyperparameters in `params.yaml`. It 
 
 ## Experiment Tracking (MLflow)
 
-Experiments are tracked locally via MLflow (no server required):
+Experiments are tracked locally via MLflow with a SQLite backend (`mlflow.db`, not committed to git):
 
 ```bash
+# Run the extended HW3 experiment suite (21 runs)
+poetry run python scripts/run_experiments.py
+
 # Launch the MLflow UI
-poetry run mlflow ui --backend-store-uri file:./mlruns --port 5000
+poetry run mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
 # Open http://localhost:5000
 ```
+
+The `src/housing/tracking/` module provides three integration patterns:
+- `@mlflow_run` — decorator for wrapping a function in a run
+- `ExperimentTracker` — context manager with `log_param/s`, `log_metric/s`, `set_tag`
+- `compare_runs`, `get_best_run`, `search_runs` — utilities for querying results
 
 ## Docker
 
 ```bash
 # Build the image
-docker build -t housing:hw2 .
+docker build -t housing:hw3 .
 
 # Run the full pipeline inside the container
-docker run --rm housing:hw2
+docker run --rm housing:hw3
 ```

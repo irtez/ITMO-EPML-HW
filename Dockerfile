@@ -30,14 +30,14 @@ COPY params.yaml dvc.yaml ./
 COPY data/raw/housing.csv ./data/raw/housing.csv
 
 # Create directories needed at runtime
-RUN mkdir -p models metrics mlruns data/processed
+RUN mkdir -p models metrics data/processed
 
 # Add venv to PATH
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONPATH="/app/src" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    MLFLOW_TRACKING_URI="file:./mlruns" \
+    MLFLOW_TRACKING_URI="sqlite:///mlflow.db" \
     GIT_PYTHON_REFRESH=quiet
 
 # Non-root user for security
