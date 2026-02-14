@@ -1,0 +1,60 @@
+defaults:
+  - _self_
+  - model: linear_regression
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  output_subdir: null
+
+prepare:
+  test_size: 0.2
+  random_state: 42
+  output:
+    train_path: data/processed/train.csv
+    test_path: data/processed/test.csv
+
+train:
+  random_state: 42
+  val_size: 0.2
+  input:
+    train_path: data/processed/train.csv
+  output:
+    model_path: models/${model.name}.joblib
+    metrics_path: metrics/train_${model.name}.json
+
+selection:
+  candidates:
+    - name: linear_regression
+      model_path: models/linear_regression.joblib
+      metrics_path: metrics/train_linear_regression.json
+    - name: ridge
+      model_path: models/ridge.joblib
+      metrics_path: metrics/train_ridge.json
+    - name: random_forest
+      model_path: models/random_forest.joblib
+      metrics_path: metrics/train_random_forest.json
+  output:
+    best_model_path: models/best_model.joblib
+    metrics_path: metrics/train_metrics.json
+
+evaluate:
+  input:
+    model_path: models/best_model.joblib
+    test_path: data/processed/test.csv
+  output:
+    metrics_path: metrics/test_metrics.json
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: boston-housing
+  model_name: housing-price-predictor
+
+monitoring:
+  events_path: metrics/pipeline_events.jsonl
+  notifications:
+    console: true
+    file: true
+    file_path: reports/pipeline_notifications.log

@@ -1,35 +1,42 @@
-"""DVC stage 1 — split raw data into train / test sets."""
+"""DVC stage: split raw data into train/test with Hydra config."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
-import yaml
+import hydra
+from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
 
+from housing.config import validate_prepare_cfg
 from housing.data.load import load_raw_housing
+from housing.pipeline.monitoring import monitored_stage
 
 
-def main() -> None:
-    """Load raw data, split into train/test, and save to data/processed/."""
-    params: dict[str, Any] = yaml.safe_load(
-        Path("params.yaml").read_text(encoding="utf-8")
-    )["prepare"]
-    test_size: float = float(params["test_size"])
-    random_state: int = int(params["random_state"])
+@hydra.main(version_base=None, config_path="../conf", config_name="pipeline")  # type: ignore[misc]
+def main(cfg: DictConfig) -> None:
+    """Load raw data, split into train/test, and save to configured paths."""
+    validate_prepare_cfg(cfg)
 
-    df = load_raw_housing()
-    train_df, test_df = train_test_split(
-        df, test_size=test_size, random_state=random_state
-    )
+    with monitored_stage(cfg, "prepare"):
+        df = load_raw_housing()
+        train_df, test_df = train_test_split(
+            df,
+            test_size=float(cfg.prepare.test_size),
+            random_state=int(cfg.prepare.random_state),
+        )
 
-    out_dir = Path("data/processed")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    train_df.to_csv(out_dir / "train.csv", index=False)
-    test_df.to_csv(out_dir / "test.csv", index=False)
+        train_path = Path(str(cfg.prepare.output.train_path))
+        test_path = Path(str(cfg.prepare.output.test_path))
 
-    print(f"Saved train ({len(train_df)} rows) and test ({len(test_df)} rows).")
+        train_path.parent.mkdir(parents=True, exist_ok=True)
+        test_path.parent.mkdir(parents=True, exist_ok=True)
+
+        train_df.to_csv(train_path, index=False)
+        test_df.to_csv(test_path, index=False)
+
+        print(f"Saved train ({len(train_df)} rows) to {train_path}")
+        print(f"Saved test ({len(test_df)} rows) to {test_path}")
 
 
 if __name__ == "__main__":

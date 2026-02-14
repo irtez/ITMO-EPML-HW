@@ -1,0 +1,4 @@
+name: ridge
+kind: ridge
+params:
+  alpha: 1.0

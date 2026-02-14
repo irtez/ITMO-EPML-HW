@@ -1,4 +1,4 @@
-"""DVC stage 2 — train models, log to MLflow, register the best one."""
+"""DVC stage: train one model variant configured via Hydra."""
 
 from __future__ import annotations
 
@@ -6,86 +6,110 @@ import json
 from pathlib import Path
 from typing import Any
 
+import hydra
 import joblib
 import mlflow
 import mlflow.sklearn
 import pandas as pd
-import yaml
+from mlflow.tracking import MlflowClient
+from omegaconf import DictConfig
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.model_selection import train_test_split
 
+from housing.config import validate_train_cfg
 from housing.features.build import get_feature_pipeline, split_features_target
 from housing.models.train import train_and_log_model
+from housing.pipeline.monitoring import monitored_stage
 
 
-def main() -> None:
-    """Train all configured models, pick the best by val RMSE, register it."""
-    raw_params: dict[str, Any] = yaml.safe_load(
-        Path("params.yaml").read_text(encoding="utf-8")
-    )
-    params: dict[str, Any] = raw_params["train"]
-    random_state: int = int(params["random_state"])
+def _build_model(cfg: DictConfig) -> tuple[Any, dict[str, Any]]:
+    model_kind = str(cfg.model.kind)
+    params = dict(cfg.model.params)
+    random_state = int(cfg.train.random_state)
 
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
-    mlflow.set_experiment("boston-housing")
-
-    train_df = pd.read_csv("data/processed/train.csv")
-    X_train, y_train = split_features_target(train_df)
-
-    ridge_params: dict[str, Any] = dict(params["models"].get("ridge", {}))
-    rf_params: dict[str, Any] = dict(params["models"].get("random_forest", {}))
-
-    model_configs: dict[str, tuple[Any, dict[str, Any]]] = {
-        "linear_regression": (LinearRegression(), {}),
-        "ridge": (
-            Ridge(alpha=float(ridge_params.get("alpha", 1.0))),
-            ridge_params,
-        ),
-        "random_forest": (
+    if model_kind == "linear_regression":
+        return LinearRegression(), params
+    if model_kind == "ridge":
+        alpha = float(params.get("alpha", 1.0))
+        return Ridge(alpha=alpha), {"alpha": alpha}
+    if model_kind == "random_forest":
+        n_estimators = int(params.get("n_estimators", 100))
+        max_depth = int(params.get("max_depth", 10))
+        return (
             RandomForestRegressor(
-                n_estimators=int(rf_params.get("n_estimators", 100)),
-                max_depth=int(rf_params.get("max_depth", 10)),
+                n_estimators=n_estimators,
+                max_depth=max_depth,
                 random_state=random_state,
             ),
-            rf_params,
-        ),
-    }
+            {
+                "n_estimators": n_estimators,
+                "max_depth": max_depth,
+            },
+        )
 
-    results: list[tuple[str, str, float]] = []
-    for name, (model, extra) in model_configs.items():
+    raise ValueError(f"Unsupported model kind: {model_kind}")
+
+
+@hydra.main(version_base=None, config_path="../conf", config_name="pipeline")  # type: ignore[misc]
+def main(cfg: DictConfig) -> None:
+    """Train the selected model and save model artifact + metrics JSON."""
+    validate_train_cfg(cfg)
+
+    with monitored_stage(cfg, f"train:{cfg.model.name}"):
+        mlflow.set_tracking_uri(str(cfg.mlflow.tracking_uri))
+        mlflow.set_experiment(str(cfg.mlflow.experiment_name))
+
+        train_df = pd.read_csv(str(cfg.train.input.train_path))
+        X_all, y_all = split_features_target(train_df)
+
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_all,
+            y_all,
+            test_size=float(cfg.train.val_size),
+            random_state=int(cfg.train.random_state),
+        )
+
+        model, extra_params = _build_model(cfg)
+
         run_id, val_rmse = train_and_log_model(
-            model_name=name,
+            model_name=str(cfg.model.name),
             model=model,
             feature_pipeline=get_feature_pipeline(),
             X_train=X_train,
             y_train=y_train,
-            X_val=X_train,
-            y_val=y_train,
-            extra_params=extra if extra else None,
+            X_val=X_val,
+            y_val=y_val,
+            extra_params=extra_params if extra_params else None,
         )
-        results.append((name, run_id, val_rmse))
-        print(f"  {name}: train_rmse={val_rmse:.4f}  run_id={run_id}")
 
-    best_name, best_run_id, best_rmse = min(results, key=lambda t: t[2])
-    print(f"\nBest model: {best_name}  (rmse={best_rmse:.4f})")
+        run = MlflowClient().get_run(run_id)
+        metrics_json = {
+            "model_name": str(cfg.model.name),
+            "run_id": run_id,
+            "train_rmse": float(run.data.metrics["train_rmse"]),
+            "train_mae": float(run.data.metrics["train_mae"]),
+            "train_r2": float(run.data.metrics["train_r2"]),
+            "val_rmse": float(val_rmse),
+            "val_mae": float(run.data.metrics["val_mae"]),
+            "val_r2": float(run.data.metrics["val_r2"]),
+        }
 
-    model_uri = f"runs:/{best_run_id}/model"
-    mlflow.register_model(model_uri=model_uri, name="housing-price-predictor")
+        model_uri = f"runs:/{run_id}/model"
+        trained_pipeline = mlflow.sklearn.load_model(model_uri)
 
-    best_pipeline = mlflow.sklearn.load_model(model_uri)
-    Path("models").mkdir(exist_ok=True)
-    joblib.dump(best_pipeline, "models/best_model.joblib")  # nosec B301
+        model_path = Path(str(cfg.train.output.model_path))
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(trained_pipeline, model_path)  # nosec B301
 
-    Path("metrics").mkdir(exist_ok=True)
-    train_metrics = {
-        "best_model": best_name,
-        "best_train_rmse": best_rmse,
-        "all_models": {n: {"train_rmse": r} for n, _, r in results},
-    }
-    Path("metrics/train_metrics.json").write_text(
-        json.dumps(train_metrics, indent=2), encoding="utf-8"
-    )
-    print("Saved best_model.joblib and metrics/train_metrics.json")
+        metrics_path = Path(str(cfg.train.output.metrics_path))
+        metrics_path.parent.mkdir(parents=True, exist_ok=True)
+        metrics_path.write_text(json.dumps(metrics_json, indent=2), encoding="utf-8")
+
+        print(
+            f"Model {cfg.model.name} trained: val_rmse={val_rmse:.4f}, "
+            f"run_id={run_id}, saved={model_path}"
+        )
 
 
 if __name__ == "__main__":
