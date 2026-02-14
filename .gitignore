@@ -62,3 +62,14 @@ Thumbs.db
 # MLflow experiment tracking
 mlflow.db
 mlruns/
+
+# Hydra runtime artifacts
+outputs/
+
+# Pipeline runtime logs
+metrics/pipeline_events.jsonl
+reports/pipeline_notifications.log
+prepare.log
+train.log
+select_best.log
+evaluate.log

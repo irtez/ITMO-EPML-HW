@@ -1,0 +1,10 @@
+{
+  "model_name": "linear_regression",
+  "run_id": "37ccb9cdd72f44d08535516ec87f7fa4",
+  "train_rmse": 4.626867660858839,
+  "train_mae": 3.333788174175013,
+  "train_r2": 0.7643039615642373,
+  "val_rmse": 4.82560235149821,
+  "val_mae": 3.210760482937757,
+  "val_r2": 0.672482798903795
+}

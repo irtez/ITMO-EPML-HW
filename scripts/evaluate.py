@@ -1,35 +1,43 @@
-"""DVC stage 3 — evaluate the best saved model on the held-out test set."""
+"""DVC stage: evaluate selected best model on held-out test data."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+import hydra
 import joblib
 import pandas as pd
+from omegaconf import DictConfig
 
+from housing.config import validate_evaluate_cfg
 from housing.features.build import split_features_target
 from housing.models.train import compute_metrics
+from housing.pipeline.monitoring import monitored_stage
 
 
-def main() -> None:
-    """Load best model and test data, compute metrics, save results."""
-    pipeline = joblib.load("models/best_model.joblib")  # nosec B301
+@hydra.main(version_base=None, config_path="../conf", config_name="pipeline")  # type: ignore[misc]
+def main(cfg: DictConfig) -> None:
+    """Load best model and test data, compute metrics, and save JSON output."""
+    validate_evaluate_cfg(cfg)
 
-    test_df = pd.read_csv("data/processed/test.csv")
-    X_test, y_test = split_features_target(test_df)
+    with monitored_stage(cfg, "evaluate"):
+        pipeline = joblib.load(str(cfg.evaluate.input.model_path))  # nosec B301
 
-    preds = pipeline.predict(X_test)
-    metrics = compute_metrics(y_test, preds)
+        test_df = pd.read_csv(str(cfg.evaluate.input.test_path))
+        X_test, y_test = split_features_target(test_df)
 
-    Path("metrics").mkdir(exist_ok=True)
-    Path("metrics/test_metrics.json").write_text(
-        json.dumps(metrics, indent=2), encoding="utf-8"
-    )
-    print(
-        f"Test metrics — RMSE: {metrics['rmse']:.4f}  "
-        f"MAE: {metrics['mae']:.4f}  R²: {metrics['r2']:.4f}"
-    )
+        preds = pipeline.predict(X_test)
+        metrics = compute_metrics(y_test, preds)
+
+        output_path = Path(str(cfg.evaluate.output.metrics_path))
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+
+        print(
+            f"Test metrics - RMSE: {metrics['rmse']:.4f} "
+            f"MAE: {metrics['mae']:.4f} R2: {metrics['r2']:.4f}"
+        )
 
 
 if __name__ == "__main__":

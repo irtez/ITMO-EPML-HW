@@ -15,17 +15,22 @@ ITMO-EPML-HW/
 ├── notebooks/          # Jupyter notebooks for EDA & experiments
 ├── reports/
 │   └── figures/        # Generated charts and visualizations
+├── conf/               # Hydra configs (composition + overrides)
+│   └── model/          # Per-algorithm configs
 ├── src/
 │   └── housing/        # Installable Python package
+│       ├── config/     # Config validation helpers
 │       ├── data/       # Data loading & cleaning scripts
 │       ├── features/   # Feature engineering
 │       ├── models/     # Model training & evaluation
+│       ├── pipeline/   # Monitoring and notifications
 │       ├── tracking/   # MLflow tracking utilities (decorator, context manager, utils)
 │       └── visualization/
 ├── scripts/
 │   ├── prepare.py      # DVC stage 1: raw → train/test split
-│   ├── train.py        # DVC stage 2: training + MLflow + registry
-│   ├── evaluate.py     # DVC stage 3: evaluation on test set
+│   ├── train.py        # DVC stages 2-4: per-model training
+│   ├── select_best.py  # DVC stage 5: best model selection + registry
+│   ├── evaluate.py     # DVC stage 6: evaluation on test set
 │   └── run_experiments.py  # Standalone: run 21 HW3 experiments
 ├── template/           # Cookiecutter template for new DS projects
 ├── tests/              # pytest test suite
@@ -132,14 +137,40 @@ Data and pipeline are managed with [DVC](https://dvc.org/). Raw data is stored i
 # Download data
 poetry run dvc pull
 
-# Run the full pipeline (prepare → train → evaluate)
+# Run the full HW4 pipeline
 poetry run dvc repro
+
+# Run multiple experiments in parallel (DVC queue workers)
+poetry run dvc exp run --queue train_linear_regression
+poetry run dvc exp run --queue train_ridge
+poetry run dvc exp run --queue train_random_forest
+poetry run dvc queue start -j 3
 
 # Show metrics
 poetry run dvc metrics show
 ```
 
-The pipeline is defined in `dvc.yaml` with hyperparameters in `params.yaml`. It trains three models (LinearRegression, Ridge, RandomForest) and registers the best one in the MLflow Model Registry.
+HW4 pipeline graph:
+`prepare -> {train_linear_regression, train_ridge, train_random_forest} -> select_best -> evaluate`
+
+The pipeline is defined in `dvc.yaml` and uses Hydra composition from `conf/pipeline.yaml` + `conf/model/*.yaml`.
+
+## Configuration Management (Hydra)
+
+Hydra is used for config composition, algorithm switching, and CLI overrides.
+
+```bash
+# Default config
+poetry run python scripts/train.py
+
+# Override algorithm config
+poetry run python scripts/train.py model=random_forest
+
+# Override any value from CLI
+poetry run python scripts/train.py model=ridge model.params.alpha=0.5
+```
+
+Validation rules are implemented in `src/housing/config/validation.py`.
 
 ## Experiment Tracking (MLflow)
 

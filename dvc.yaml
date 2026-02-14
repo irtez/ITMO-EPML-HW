@@ -2,25 +2,96 @@ stages:
   prepare:
     cmd: python scripts/prepare.py
     deps:
+      - conf/pipeline.yaml
       - scripts/prepare.py
+      - src/housing/config/validation.py
       - src/housing/data/load.py
+      - src/housing/pipeline/monitoring.py
       - data/raw/housing.csv
     params:
-      - prepare.test_size
-      - prepare.random_state
+      - conf/pipeline.yaml:
+          - prepare.test_size
+          - prepare.random_state
     outs:
       - data/processed/train.csv
       - data/processed/test.csv
 
-  train:
-    cmd: python scripts/train.py
+  train_linear_regression:
+    cmd: python scripts/train.py model=linear_regression
     deps:
+      - conf/pipeline.yaml
+      - conf/model/linear_regression.yaml
       - scripts/train.py
+      - src/housing/config/validation.py
       - src/housing/features/build.py
       - src/housing/models/train.py
+      - src/housing/pipeline/monitoring.py
       - data/processed/train.csv
     params:
-      - train
+      - conf/pipeline.yaml:
+          - train.random_state
+          - train.val_size
+    outs:
+      - models/linear_regression.joblib
+    metrics:
+      - metrics/train_linear_regression.json:
+          cache: false
+
+  train_ridge:
+    cmd: python scripts/train.py model=ridge
+    deps:
+      - conf/pipeline.yaml
+      - conf/model/ridge.yaml
+      - scripts/train.py
+      - src/housing/config/validation.py
+      - src/housing/features/build.py
+      - src/housing/models/train.py
+      - src/housing/pipeline/monitoring.py
+      - data/processed/train.csv
+    params:
+      - conf/pipeline.yaml:
+          - train.random_state
+          - train.val_size
+    outs:
+      - models/ridge.joblib
+    metrics:
+      - metrics/train_ridge.json:
+          cache: false
+
+  train_random_forest:
+    cmd: python scripts/train.py model=random_forest
+    deps:
+      - conf/pipeline.yaml
+      - conf/model/random_forest.yaml
+      - scripts/train.py
+      - src/housing/config/validation.py
+      - src/housing/features/build.py
+      - src/housing/models/train.py
+      - src/housing/pipeline/monitoring.py
+      - data/processed/train.csv
+    params:
+      - conf/pipeline.yaml:
+          - train.random_state
+          - train.val_size
+    outs:
+      - models/random_forest.joblib
+    metrics:
+      - metrics/train_random_forest.json:
+          cache: false
+
+  select_best:
+    cmd: python scripts/select_best.py
+    deps:
+      - conf/pipeline.yaml
+      - scripts/select_best.py
+      - src/housing/config/validation.py
+      - src/housing/pipeline/monitoring.py
+      - models/linear_regression.joblib
+      - models/ridge.joblib
+      - models/random_forest.joblib
+      - metrics/train_linear_regression.json
+      - metrics/train_ridge.json
+      - metrics/train_random_forest.json
     outs:
       - models/best_model.joblib
     metrics:
@@ -30,8 +101,12 @@ stages:
   evaluate:
     cmd: python scripts/evaluate.py
     deps:
+      - conf/pipeline.yaml
       - scripts/evaluate.py
+      - src/housing/config/validation.py
       - src/housing/features/build.py
+      - src/housing/models/train.py
+      - src/housing/pipeline/monitoring.py
       - models/best_model.joblib
       - data/processed/test.csv
     metrics:
