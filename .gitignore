@@ -57,11 +57,15 @@ Thumbs.db
 
 # Env files
 .env
-.env.*
 
 # MLflow experiment tracking
 mlflow.db
 mlruns/
+
+# ClearML local runtime
+clearml.conf
+clearml_data/
+infra/clearml/data/
 
 # Hydra runtime artifacts
 outputs/
@@ -73,3 +77,8 @@ prepare.log
 train.log
 select_best.log
 evaluate.log
+clearml_compare.log
+clearml_pipeline.log
+metrics/clearml_experiments.csv
+metrics/clearml_models.csv
+metrics/clearml_pipeline_schedule.txt

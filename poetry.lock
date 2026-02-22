@@ -894,6 +894,40 @@ files = [
 ]
 
 [[package]]
+name = "clearml"
+version = "1.18.0"
+description = "ClearML - Auto-Magical Experiment Manager, Version Control, and MLOps for AI"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "clearml-1.18.0-py2.py3-none-any.whl", hash = "sha256:fe53ffcfdb0799150ad5ae1ca95bdbd568e570cbde2e35a65474e36606a899d0"},
+]
+
+[package.dependencies]
+attrs = ">=18.0"
+furl = ">=2.0.0"
+jsonschema = ">=2.6.0"
+numpy = ">=1.10"
+pathlib2 = ">=2.3.0"
+Pillow = ">=4.1.1"
+psutil = ">=3.4.2"
+pyjwt = {version = ">=2.4.0,<2.10.0", markers = "python_version > \"3.5\""}
+pyparsing = ">=2.0.3"
+python-dateutil = ">=2.6.1"
+PyYAML = ">=3.12"
+referencing = {version = "<0.40", markers = "python_version >= \"3.8\""}
+requests = ">=2.20.0"
+six = ">=1.16.0"
+urllib3 = ">=1.21.1"
+
+[package.extras]
+azure = ["azure-storage-blob (>=12.0.0)"]
+gs = ["google-cloud-storage (>=1.13.2)"]
+router = ["fastapi (>=0.115.2)", "httpx (>=0.27.2)", "uvicorn (>=0.31.1)"]
+s3 = ["boto3 (>=1.9)"]
+
+[[package]]
 name = "click"
 version = "8.3.1"
 description = "Composable command line interface toolkit"
@@ -2287,6 +2321,22 @@ files = [
     {file = "funcy-2.0-py2.py3-none-any.whl", hash = "sha256:53df23c8bb1651b12f095df764bfb057935d49537a56de211b098f4c79614bb0"},
     {file = "funcy-2.0.tar.gz", hash = "sha256:3963315d59d41c6f30c04bc910e10ab50a3ac4a225868bfa96feed133df075cb"},
 ]
+
+[[package]]
+name = "furl"
+version = "2.1.4"
+description = "URL manipulation made simple."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "furl-2.1.4-py2.py3-none-any.whl", hash = "sha256:da34d0b34e53ffe2d2e6851a7085a05d96922b5b578620a37377ff1dbeeb11c8"},
+    {file = "furl-2.1.4.tar.gz", hash = "sha256:877657501266c929269739fb5f5980534a41abd6bbabcb367c136d1d3b2a6015"},
+]
+
+[package.dependencies]
+orderedmultidict = ">=1.0.1"
+six = ">=1.8.0"
 
 [[package]]
 name = "gitdb"
@@ -4385,6 +4435,21 @@ opentelemetry-api = "1.39.1"
 typing-extensions = ">=4.5.0"
 
 [[package]]
+name = "orderedmultidict"
+version = "1.0.2"
+description = "Ordered Multivalue Dictionary"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "orderedmultidict-1.0.2-py2.py3-none-any.whl", hash = "sha256:ab5044c1dca4226ae4c28524cfc5cc4c939f0b49e978efa46a6ad6468049f79b"},
+    {file = "orderedmultidict-1.0.2.tar.gz", hash = "sha256:16a7ae8432e02cc987d2d6d5af2df5938258f87c870675c73ee77a0920e6f4a6"},
+]
+
+[package.dependencies]
+six = ">=1.8.0"
+
+[[package]]
 name = "orjson"
 version = "3.11.7"
 description = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
@@ -4624,6 +4689,21 @@ files = [
 [package.extras]
 qa = ["flake8 (==5.0.4)", "types-setuptools (==67.2.0.1)", "zuban (==0.5.1)"]
 testing = ["docopt", "pytest"]
+
+[[package]]
+name = "pathlib2"
+version = "2.3.7.post1"
+description = "Object-oriented filesystem paths"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "pathlib2-2.3.7.post1-py2.py3-none-any.whl", hash = "sha256:5266a0fd000452f1b3467d782f079a4343c63aaa119221fbdc4e39577489ca5b"},
+    {file = "pathlib2-2.3.7.post1.tar.gz", hash = "sha256:9fe0edad898b83c0c3e199c842b27ed216645d2e177757b2dd67384d4113c641"},
+]
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "pathspec"
@@ -5523,6 +5603,24 @@ files = [
     {file = "pygtrie-2.5.0-py3-none-any.whl", hash = "sha256:8795cda8105493d5ae159a5bef313ff13156c5d4d72feddefacaad59f8c8ce16"},
     {file = "pygtrie-2.5.0.tar.gz", hash = "sha256:203514ad826eb403dab1d2e2ddd034e0d1534bbe4dbe0213bb0593f66beba4e2"},
 ]
+
+[[package]]
+name = "pyjwt"
+version = "2.9.0"
+description = "JSON Web Token implementation in Python"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "PyJWT-2.9.0-py3-none-any.whl", hash = "sha256:3b02fb0f44517787776cf48f2ae25d8e14f300e6d7545a4315cee571a415e850"},
+    {file = "pyjwt-2.9.0.tar.gz", hash = "sha256:7e1e5b56cc735432a7369cbfa0efe50fa113ebecdc04ae6922deba8b84582d0c"},
+]
+
+[package.extras]
+crypto = ["cryptography (>=3.4.0)"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx", "sphinx-rtd-theme", "zope.interface"]
+docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pyparsing"
@@ -7433,4 +7531,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "98ad13b2b2bb9588af1641149d2d40574ec58156562508dfa40f3465cb4eae37"
+content-hash = "27dae06ce0eb644ecc3c8d050c8e77ed38268a70ef5c7108922930e754458ef7"

@@ -5,20 +5,20 @@ stages:
     deps:
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: data/raw/housing.csv
       hash: md5
       md5: d4accdce7a25600298819f8e28e8d593
       size: 49082
     - path: scripts/prepare.py
       hash: md5
-      md5: 0005b19aea5051f664d5ca341c8c1d87
-      size: 1377
+      md5: 909e2cf241a8d8a8d5a19b3b4f17a653
+      size: 2206
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/data/load.py
       hash: md5
       md5: 06e27392257da94c16d91629172ea486
@@ -27,6 +27,10 @@ stages:
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     params:
       conf/pipeline.yaml:
         prepare.random_state: 42
@@ -84,8 +88,8 @@ stages:
     deps:
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: data/processed/test.csv
       hash: md5
       md5: 63ba6aaa77d7d2cb721fd841f3d49775
@@ -96,12 +100,12 @@ stages:
       size: 1941264
     - path: scripts/evaluate.py
       hash: md5
-      md5: 40e19a6f7f3b6bacda732d41cad14cfc
-      size: 1399
+      md5: 1292f6a738a64ab7302b7fbd4713e08c
+      size: 1690
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/features/build.py
       hash: md5
       md5: 7c7656776d91dd3afc280f999058246c
@@ -114,6 +118,10 @@ stages:
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     outs:
     - path: metrics/test_metrics.json
       hash: md5
@@ -128,20 +136,20 @@ stages:
       size: 59
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: data/processed/train.csv
       hash: md5
       md5: bb1e5bcc9b88e671891c1b4d70509d52
       size: 29661
     - path: scripts/train.py
       hash: md5
-      md5: e235225aa52c538b9daf112156fb9f08
-      size: 3984
+      md5: fcc911e555103cb2bcb039857c54d6ed
+      size: 5668
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/features/build.py
       hash: md5
       md5: 7c7656776d91dd3afc280f999058246c
@@ -154,6 +162,10 @@ stages:
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     params:
       conf/pipeline.yaml:
         train.random_state: 42
@@ -161,7 +173,7 @@ stages:
     outs:
     - path: metrics/train_linear_regression.json
       hash: md5
-      md5: d8986d72ef01649a73cd1446487e22d6
+      md5: 8b885d91c263f17e2648f14f907d3806
       size: 285
     - path: models/linear_regression.joblib
       hash: md5
@@ -176,20 +188,20 @@ stages:
       size: 45
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: data/processed/train.csv
       hash: md5
       md5: bb1e5bcc9b88e671891c1b4d70509d52
       size: 29661
     - path: scripts/train.py
       hash: md5
-      md5: e235225aa52c538b9daf112156fb9f08
-      size: 3984
+      md5: fcc911e555103cb2bcb039857c54d6ed
+      size: 5668
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/features/build.py
       hash: md5
       md5: 7c7656776d91dd3afc280f999058246c
@@ -202,6 +214,10 @@ stages:
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     params:
       conf/pipeline.yaml:
         train.random_state: 42
@@ -209,7 +225,7 @@ stages:
     outs:
     - path: metrics/train_ridge.json
       hash: md5
-      md5: 2cc1ef0afecd206468b1e620d76154d3
+      md5: ca19adc7cacbcbb39920d2d9c41c01ac
       size: 276
     - path: models/ridge.joblib
       hash: md5
@@ -224,20 +240,20 @@ stages:
       size: 84
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: data/processed/train.csv
       hash: md5
       md5: bb1e5bcc9b88e671891c1b4d70509d52
       size: 29661
     - path: scripts/train.py
       hash: md5
-      md5: e235225aa52c538b9daf112156fb9f08
-      size: 3984
+      md5: fcc911e555103cb2bcb039857c54d6ed
+      size: 5668
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/features/build.py
       hash: md5
       md5: 7c7656776d91dd3afc280f999058246c
@@ -250,6 +266,10 @@ stages:
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     params:
       conf/pipeline.yaml:
         train.random_state: 42
@@ -257,7 +277,7 @@ stages:
     outs:
     - path: metrics/train_random_forest.json
       hash: md5
-      md5: 8b1cf205fc588d892d4b21254805d388
+      md5: aceca88c790e88baa890719f033b1881
       size: 285
     - path: models/random_forest.joblib
       hash: md5
@@ -268,19 +288,19 @@ stages:
     deps:
     - path: conf/pipeline.yaml
       hash: md5
-      md5: 9a0a1a28c9ff90d671cb9822a5854981
-      size: 1375
+      md5: c05c66b5465daa0b951d07a007f5ff0b
+      size: 1901
     - path: metrics/train_linear_regression.json
       hash: md5
-      md5: d8986d72ef01649a73cd1446487e22d6
+      md5: 8b885d91c263f17e2648f14f907d3806
       size: 285
     - path: metrics/train_random_forest.json
       hash: md5
-      md5: 8b1cf205fc588d892d4b21254805d388
+      md5: aceca88c790e88baa890719f033b1881
       size: 285
     - path: metrics/train_ridge.json
       hash: md5
-      md5: 2cc1ef0afecd206468b1e620d76154d3
+      md5: ca19adc7cacbcbb39920d2d9c41c01ac
       size: 276
     - path: models/linear_regression.joblib
       hash: md5
@@ -296,20 +316,24 @@ stages:
       size: 1817
     - path: scripts/select_best.py
       hash: md5
-      md5: f6f83d59c2b502fa267f0f94ec5a63c2
-      size: 2366
+      md5: 30418bce2d078fa217d6868f178613ce
+      size: 3245
     - path: src/housing/config/validation.py
       hash: md5
-      md5: 61971a6038fbad3dd1e257e8ca2df07a
-      size: 3009
+      md5: e6884b2988634c17c686c3c3c7c0af5b
+      size: 4603
     - path: src/housing/pipeline/monitoring.py
       hash: md5
       md5: b157c9dea3310c29cda11d3d314f53ea
       size: 1991
+    - path: src/housing/tracking/clearml.py
+      hash: md5
+      md5: 0909fa2339b6420f97ba4a94dd123ac2
+      size: 9275
     outs:
     - path: metrics/train_metrics.json
       hash: md5
-      md5: 41b45438bcf34401c50d30650cba0640
+      md5: 3b98d72c91ede81947dd58fa8b4bfb3c
       size: 675
     - path: models/best_model.joblib
       hash: md5

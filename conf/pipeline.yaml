@@ -52,6 +52,28 @@ mlflow:
   experiment_name: boston-housing
   model_name: housing-price-predictor
 
+clearml:
+  enabled: true
+  project_name: boston-housing-hw5
+  task_prefix: housing-pipeline
+  model_name: housing-price-predictor
+  output_uri: ""
+  tags:
+    - hw5
+    - boston-housing
+  server:
+    api_host: http://localhost:8008
+    web_host: http://localhost:8080
+    files_host: http://localhost:8081
+  auth:
+    access_key_env: CLEARML_API_ACCESS_KEY
+    secret_key_env: CLEARML_API_SECRET_KEY
+  pipeline:
+    name: housing-hw5-pipeline
+    execution_queue: default
+    run_locally: true
+    schedule_cron: "0 6 * * *"
+
 monitoring:
   events_path: metrics/pipeline_events.jsonl
   notifications:

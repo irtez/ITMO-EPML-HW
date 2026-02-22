@@ -1,0 +1,93 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: clearml-mongo
+    restart: unless-stopped
+    volumes:
+      - ./data/mongo:/data/db
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: clearml-redis
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
+    container_name: clearml-elasticsearch
+    restart: unless-stopped
+    user: "1000:0"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+
+  apiserver:
+    image: allegroai/clearml:latest
+    container_name: clearml-apiserver
+    restart: unless-stopped
+    command: apiserver
+    depends_on:
+      - mongo
+      - redis
+      - elasticsearch
+    environment:
+      - CLEARML_MONGODB_SERVICE_HOST=mongo
+      - CLEARML_MONGODB_SERVICE_PORT=27017
+      - CLEARML_REDIS_SERVICE_HOST=redis
+      - CLEARML_REDIS_SERVICE_PORT=6379
+      - CLEARML_ELASTIC_SERVICE_HOST=elasticsearch
+      - CLEARML_ELASTIC_SERVICE_PORT=9200
+    ports:
+      - "8008:8008"
+
+  webserver:
+    image: allegroai/clearml:latest
+    container_name: clearml-webserver
+    restart: unless-stopped
+    command: webserver
+    depends_on:
+      - apiserver
+    ports:
+      - "8080:80"
+
+  fileserver:
+    image: allegroai/clearml:latest
+    container_name: clearml-fileserver
+    restart: unless-stopped
+    command: fileserver
+    depends_on:
+      - apiserver
+    volumes:
+      - ./data/fileserver:/mnt/fileserver
+    ports:
+      - "8081:8081"
+
+  clearml-agent:
+    image: allegroai/clearml-agent:latest
+    container_name: clearml-agent
+    restart: unless-stopped
+    profiles:
+      - agent
+    depends_on:
+      - apiserver
+      - fileserver
+      - webserver
+    environment:
+      - CLEARML_API_HOST=http://apiserver:8008
+      - CLEARML_WEB_HOST=http://webserver:8080
+      - CLEARML_FILES_HOST=http://fileserver:8081
+      - CLEARML_API_ACCESS_KEY=${CLEARML_API_ACCESS_KEY}
+      - CLEARML_API_SECRET_KEY=${CLEARML_API_SECRET_KEY}
+      - CLEARML_AGENT_QUEUE=default
+      - CLEARML_AGENT_GIT_USER=${CLEARML_AGENT_GIT_USER}
+      - CLEARML_AGENT_GIT_PASS=${CLEARML_AGENT_GIT_PASS}
+    volumes:
+      - ./agent.conf:/root/clearml.conf:ro
+    command:
+      - daemon
+      - --queue
+      - default

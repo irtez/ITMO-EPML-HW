@@ -1,6 +1,6 @@
 {
   "model_name": "linear_regression",
-  "run_id": "37ccb9cdd72f44d08535516ec87f7fa4",
+  "run_id": "aca4c4bf99bf47958d09ea6de219f271",
   "train_rmse": 4.626867660858839,
   "train_mae": 3.333788174175013,
   "train_r2": 0.7643039615642373,

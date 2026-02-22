@@ -24,14 +24,18 @@ ITMO-EPML-HW/
 │       ├── features/   # Feature engineering
 │       ├── models/     # Model training & evaluation
 │       ├── pipeline/   # Monitoring and notifications
-│       ├── tracking/   # MLflow tracking utilities (decorator, context manager, utils)
+│       ├── tracking/   # MLflow + ClearML tracking utilities
 │       └── visualization/
 ├── scripts/
 │   ├── prepare.py      # DVC stage 1: raw → train/test split
 │   ├── train.py        # DVC stages 2-4: per-model training
 │   ├── select_best.py  # DVC stage 5: best model selection + registry
 │   ├── evaluate.py     # DVC stage 6: evaluation on test set
-│   └── run_experiments.py  # Standalone: run 21 HW3 experiments
+│   ├── run_experiments.py  # Standalone: run 21 HW3 experiments
+│   ├── clearml_pipeline.py # HW5: ClearML pipeline controller
+│   └── clearml_compare.py  # HW5: export ClearML comparisons to CSV
+├── infra/
+│   └── clearml/        # Docker Compose for ClearML Server + agent
 ├── template/           # Cookiecutter template for new DS projects
 ├── tests/              # pytest test suite
 ├── .pre-commit-config.yaml
@@ -189,6 +193,53 @@ The `src/housing/tracking/` module provides three integration patterns:
 - `@mlflow_run` — decorator for wrapping a function in a run
 - `ExperimentTracker` — context manager with `log_param/s`, `log_metric/s`, `set_tag`
 - `compare_runs`, `get_best_run`, `search_runs` — utilities for querying results
+
+## ClearML (HW5)
+
+### Server setup
+
+```bash
+cd infra/clearml
+cp .env.example .env
+docker compose up -d
+
+# Optional: start ClearML agent after setting valid API credentials in .env
+docker compose --profile agent up -d clearml-agent
+```
+
+ClearML services after startup:
+- API: `http://localhost:8008`
+- Web UI: `http://localhost:8080`
+- File server: `http://localhost:8081`
+
+### Client setup
+
+```bash
+cp conf/clearml/clearml.conf.example clearml.conf
+export CLEARML_API_ACCESS_KEY=<your-access-key>
+export CLEARML_API_SECRET_KEY=<your-secret-key>
+export CLEARML_CONFIG_FILE=$PWD/clearml.conf
+```
+
+### Pipeline and tracking
+
+```bash
+# Enable ClearML in conf/pipeline.yaml:
+# clearml:
+#   enabled: true
+
+# Run DVC workflow
+poetry run dvc repro
+
+# or run scripts directly with Hydra override
+poetry run python scripts/train.py model=random_forest clearml.enabled=true
+
+# Run ClearML pipeline controller
+poetry run python scripts/clearml_pipeline.py clearml.enabled=true
+
+# Export experiment/model comparison tables
+poetry run python scripts/clearml_compare.py clearml.enabled=true
+```
 
 ## Docker
 
