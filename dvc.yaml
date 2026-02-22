@@ -7,6 +7,7 @@ stages:
       - src/housing/config/validation.py
       - src/housing/data/load.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - data/raw/housing.csv
     params:
       - conf/pipeline.yaml:
@@ -26,6 +27,7 @@ stages:
       - src/housing/features/build.py
       - src/housing/models/train.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - data/processed/train.csv
     params:
       - conf/pipeline.yaml:
@@ -47,6 +49,7 @@ stages:
       - src/housing/features/build.py
       - src/housing/models/train.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - data/processed/train.csv
     params:
       - conf/pipeline.yaml:
@@ -68,6 +71,7 @@ stages:
       - src/housing/features/build.py
       - src/housing/models/train.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - data/processed/train.csv
     params:
       - conf/pipeline.yaml:
@@ -86,6 +90,7 @@ stages:
       - scripts/select_best.py
       - src/housing/config/validation.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - models/linear_regression.joblib
       - models/ridge.joblib
       - models/random_forest.joblib
@@ -107,6 +112,7 @@ stages:
       - src/housing/features/build.py
       - src/housing/models/train.py
       - src/housing/pipeline/monitoring.py
+      - src/housing/tracking/clearml.py
       - models/best_model.joblib
       - data/processed/test.csv
     metrics:

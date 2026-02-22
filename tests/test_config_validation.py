@@ -8,6 +8,7 @@ import pytest
 from hydra import compose, initialize_config_dir
 
 from housing.config import (
+    validate_clearml_cfg,
     validate_evaluate_cfg,
     validate_prepare_cfg,
     validate_select_cfg,
@@ -38,6 +39,22 @@ def test_hydra_allows_model_override() -> None:
 
 def test_validate_prepare_cfg_accepts_defaults(composed_cfg: object) -> None:
     validate_prepare_cfg(composed_cfg)  # type: ignore[arg-type]
+
+
+def test_validate_clearml_cfg_accepts_disabled(composed_cfg: object) -> None:
+    validate_clearml_cfg(composed_cfg)  # type: ignore[arg-type]
+
+
+def test_validate_clearml_cfg_requires_project_name_when_enabled() -> None:
+    cfg = _compose("clearml.enabled=true", "clearml.project_name=' '")
+    with pytest.raises(ValueError, match="clearml.project_name"):
+        validate_clearml_cfg(cfg)
+
+
+def test_validate_clearml_cfg_requires_api_host_format() -> None:
+    cfg = _compose("clearml.enabled=true", "clearml.server.api_host=localhost:8008")
+    with pytest.raises(ValueError, match="clearml.server.api_host"):
+        validate_clearml_cfg(cfg)
 
 
 def test_validate_train_cfg_rejects_invalid_ratio() -> None:

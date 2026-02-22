@@ -1,0 +1,16 @@
+api {
+    api_server: http://localhost:8008
+    web_server: http://localhost:8080
+    files_server: http://localhost:8081
+    credentials {
+        "access_key" = "${CLEARML_API_ACCESS_KEY}"
+        "secret_key" = "${CLEARML_API_SECRET_KEY}"
+    }
+}
+
+sdk {
+    default_output_uri: file:///tmp/clearml-artifacts
+    development {
+        task_reuse_time_window_in_hours: 0
+    }
+}

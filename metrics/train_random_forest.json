@@ -1,6 +1,6 @@
 {
   "model_name": "random_forest",
-  "run_id": "0e46e2d01503455dbc7ac01e14d06654",
+  "run_id": "f7379d7a8f794a4db63c04ae7132dc35",
   "train_rmse": 1.6505144039319743,
   "train_mae": 1.056510074040334,
   "train_r2": 0.9700072170411377,

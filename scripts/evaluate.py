@@ -14,6 +14,7 @@ from housing.config import validate_evaluate_cfg
 from housing.features.build import split_features_target
 from housing.models.train import compute_metrics
 from housing.pipeline.monitoring import monitored_stage
+from housing.tracking import ClearMLTracker
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="pipeline")  # type: ignore[misc]
@@ -22,22 +23,26 @@ def main(cfg: DictConfig) -> None:
     validate_evaluate_cfg(cfg)
 
     with monitored_stage(cfg, "evaluate"):
-        pipeline = joblib.load(str(cfg.evaluate.input.model_path))  # nosec B301
+        with ClearMLTracker(cfg, stage="evaluate", task_type="testing") as cml:
+            pipeline = joblib.load(str(cfg.evaluate.input.model_path))  # nosec B301
 
-        test_df = pd.read_csv(str(cfg.evaluate.input.test_path))
-        X_test, y_test = split_features_target(test_df)
+            test_df = pd.read_csv(str(cfg.evaluate.input.test_path))
+            X_test, y_test = split_features_target(test_df)
 
-        preds = pipeline.predict(X_test)
-        metrics = compute_metrics(y_test, preds)
+            preds = pipeline.predict(X_test)
+            metrics = compute_metrics(y_test, preds)
 
-        output_path = Path(str(cfg.evaluate.output.metrics_path))
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+            output_path = Path(str(cfg.evaluate.output.metrics_path))
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
 
-        print(
-            f"Test metrics - RMSE: {metrics['rmse']:.4f} "
-            f"MAE: {metrics['mae']:.4f} R2: {metrics['r2']:.4f}"
-        )
+            cml.log_metrics(metrics, series="test")
+            cml.upload_artifact("test_metrics_json", output_path)
+
+            print(
+                f"Test metrics - RMSE: {metrics['rmse']:.4f} "
+                f"MAE: {metrics['mae']:.4f} R2: {metrics['r2']:.4f}"
+            )
 
 
 if __name__ == "__main__":
