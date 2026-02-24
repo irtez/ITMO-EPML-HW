@@ -54,6 +54,8 @@ mkdocs serve
 
 ![02_github_actions](figures/hw6/02_github_actions.png)
 
+![04_actions_coverage](figures/hw6/04_actions_coverage.png)
+
 ---
 
 ## 2. Автоматическая генерация отчётов об экспериментах
@@ -94,15 +96,15 @@ reports/experiments/
 
 **Сравнение моделей:**
 
-![model_comparison](../experiments/figures/model_comparison.png)
+![model_comparison](experiments/figures/model_comparison_example.png)
 
 **Train vs Validation RMSE (переобучение):**
 
-![train_val_gap](../experiments/figures/train_val_gap.png)
+![train_val_gap](experiments/figures/train_val_gap_example.png)
 
 **Тестовые метрики лучшей модели:**
 
-![test_metrics](../experiments/figures/test_metrics.png)
+![test_metrics](experiments/figures/test_metrics_example.png)
 
 ### 2.4. Пример сгенерированного отчёта
 
