@@ -1,0 +1,88 @@
+name: Tests and Code Quality
+
+on:
+  push:
+    branches:
+      - master
+      - "hw/**"
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  quality:
+    name: Code quality checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.5
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Ruff lint
+        run: poetry run ruff check src/ scripts/
+
+      - name: Ruff format check
+        run: poetry run ruff format --check src/ scripts/
+
+      - name: MyPy type check
+        run: poetry run mypy src/
+
+      - name: Bandit security check
+        run: poetry run bandit -c pyproject.toml -r src/
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.5
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Create required directories
+        run: |
+          mkdir -p data/raw data/processed metrics models
+
+      - name: Copy housing data for tests
+        run: |
+          # Данные хранятся в DVC; для CI копируем минимальную версию
+          # Тесты используют синтетические данные через conftest.py (tiny_df)
+          # Если реальные данные нужны — нужен dvc pull с настроенным remote
+          echo "Data directories ready (tests use synthetic data from conftest.py)"
+
+      - name: Run tests
+        run: |
+          poetry run pytest \
+            --cov=src/housing \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            -v
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false

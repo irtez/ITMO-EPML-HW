@@ -250,3 +250,54 @@ docker build -t housing:hw3 .
 # Run the full pipeline inside the container
 docker run --rm housing:hw3
 ```
+
+## Documentation (HW6)
+
+Full project documentation is published at GitHub Pages (see repo settings).
+
+### Local docs server
+
+```bash
+# Install docs dependencies
+pip install mkdocs mkdocs-material
+# or via Poetry:
+poetry install --with docs
+
+# Serve locally
+mkdocs serve
+# Open http://127.0.0.1:8000
+```
+
+### Build & deploy
+
+```bash
+# Build static site
+mkdocs build
+
+# Deploy to GitHub Pages (gh-pages branch)
+mkdocs gh-deploy --force
+```
+
+GitHub Actions deploys docs automatically on every push to `master` (`.github/workflows/docs.yml`).
+
+### Generate experiment report
+
+```bash
+poetry run python scripts/generate_report.py
+# Creates reports/report_hw6.md + reports/figures/hw6/*.png
+```
+
+## Reproducing results
+
+Full reproduction from scratch:
+
+```bash
+git clone <repo-url> && cd ITMO-EPML-HW
+poetry install
+poetry run dvc pull
+poetry run dvc repro
+poetry run pytest
+poetry run python scripts/generate_report.py
+```
+
+Reproducibility is ensured by: `poetry.lock` (deps), `dvc.lock` + `*.dvc` (data hashes), `random_state=42` (seeds), `Dockerfile` (environment).

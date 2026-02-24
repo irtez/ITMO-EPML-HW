@@ -1,0 +1,91 @@
+site_name: Boston Housing — ITMO EPML
+site_description: >
+  Документация проекта по предсказанию цен на жилье (ITMO Engineering Practices for ML)
+site_author: Artyom Kabanov
+site_url: https://irtez.github.io/ITMO-EPML-HW/
+
+repo_name: ITMO-EPML-HW
+repo_url: https://github.com/irtez/ITMO-EPML-HW
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  language: ru
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Переключить на тёмную тему
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Переключить на светлую тему
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      lang: ru
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Главная: index.md
+  - Руководство по развертыванию: deployment.md
+  - Примеры использования: usage.md
+  - ML-пайплайн: pipeline.md
+  - Эксперименты: experiments.md
+  - Воспроизводимость: reproducibility.md
+  - API Reference:
+      - Обзор: api/index.md
+      - Данные: api/data.md
+      - Признаки: api/features.md
+      - Модели: api/models.md
+      - Трекинг: api/tracking.md
+      - Конфигурация: api/config.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/irtez/ITMO-EPML-HW

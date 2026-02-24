@@ -70,6 +70,9 @@ infra/clearml/data/
 # Hydra runtime artifacts
 outputs/
 
+# MkDocs build output
+site/
+
 # Pipeline runtime logs
 metrics/pipeline_events.jsonl
 reports/pipeline_notifications.log
