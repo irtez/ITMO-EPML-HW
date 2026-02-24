@@ -2,9 +2,19 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
+
+
+@pytest.fixture
+def housing_csv(tmp_path: Path, tiny_df: pd.DataFrame) -> Path:
+    """Write tiny_df as whitespace-separated CSV (no header) matching housing.csv format."""  # noqa: E501
+    path = tmp_path / "housing.csv"
+    tiny_df.to_csv(path, sep=" ", header=False, index=False)
+    return path
 
 
 @pytest.fixture
